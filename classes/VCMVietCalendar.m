@@ -7,7 +7,7 @@
 //
 
 #import "VCMVietCalendar.h"
-#import "Constants.h"
+#import "calLibConstants.h"
 
 @implementation VCMVietCalendar
 
