@@ -29,7 +29,7 @@
  * @param yy
  * @return the number of days since 1 January 4713 BC (Julian calendar)
  */
-- (NSInteger)jdFromDate:(NSInteger)dd month:(NSInteger)mm year:(NSInteger)yy {
+- (int)jdFromDate:(int)dd month:(int)mm year:(int)yy {
     int a = (14 - mm) / 12;
     int y = yy + 4800 - a;
     int m = mm + 12 * a - 3;
@@ -41,7 +41,7 @@
     return jd;
 }
 
-- (NSArray *)jdToDate:(NSInteger)jd {
+- (NSArray *)jdToDate:(int)jd {
     int a, b, c;
     if (jd > 2299160) { // sau 5/10/1582, lich Gregorian
         a = jd + 32044;
@@ -62,7 +62,7 @@
     return tmpl;
 }
 
-- (double) NewMoonAA98:(NSInteger)k {
+- (double) NewMoonAA98:(int)k {
     double T = k / 1236.85;
     double T2 = T * T;
     double T3 = T2 * T;
@@ -93,11 +93,11 @@
     return JdNew;
 }
 
-- (NSInteger)INT:(double)d {
+- (int)INT:(double)d {
     return (int)floor(d);
 }
 
-- (NSInteger)getNewMoonDay:(NSInteger)k TimeZone:(double)timeZone {
+- (int)getNewMoonDay:(int)k TimeZone:(double)timeZone {
     double jd = [self NewMoonAA98:k];
     return [self INT:(jd + 0.5 + timeZone / 24)];
 }
@@ -149,7 +149,7 @@
     return i - 1;
 }
 
-- (NSArray *)to_am:(NSInteger)dd month:(NSInteger)mm year:(NSInteger)yy TimeZone:(double)timeZone {
+- (NSArray *)to_am:(int)dd month:(int)mm year:(int)yy TimeZone:(double)timeZone {
     int lunarDay, lunarMonth, lunarYear, lunarLeap;
     int dayNumber = [self jdFromDate:dd month:mm year:yy];
     int k = [self INT:((dayNumber - 2415021.076998695) / 29.530588853)];
@@ -194,7 +194,7 @@
     // return new int[]{lunarDay, lunarMonth, lunarYear, lunarLeap};
 }
 
-- (NSArray *)to_duong:(NSInteger)lunarDay LunaMonth:(NSInteger)lunarMonth LunaYear:(NSInteger)lunarYear LunaLeap:(NSInteger)lunarLeap TimeZone:(double)timeZone {
+- (NSArray *)to_duong:(int)lunarDay LunaMonth:(int)lunarMonth LunaYear:(int)lunarYear LunaLeap:(int)lunarLeap TimeZone:(double)timeZone {
     int a11, b11;
     if (lunarMonth < 11) {
         a11 = [self getLunarMonth11:(lunarYear-1) TimeZone:timeZone];// getLunarMonth11(lunarYear - 1, timeZone);
@@ -229,7 +229,7 @@
     return [self jdToDate:(monthStart + lunarDay - 1)];
 }
 
-- (BOOL)Namnhuan:(NSInteger)yy {
+- (BOOL)Namnhuan:(int)yy {
     if ((yy % 4 == 0 && yy % 100 != 0) || (yy % 400 == 0))
         return true; // nam nhuan,0
     return false; // khong nhuan,1
@@ -238,7 +238,7 @@
 // 1,3,5,7,8,10,12 ->31 ngay
 // 4,6,9,11 ->30 ngay
 // 2-> tuy
-- (NSInteger)ByteThang:(NSInteger)mm Year:(NSInteger)yy {// so ngay cua 1 thang
+- (int)ByteThang:(int)mm Year:(int)yy {// so ngay cua 1 thang
     if (mm == 1 || mm == 3 || mm == 5 || mm == 7 || mm == 8 || mm == 10 || mm == 12) {
         return 31;
     }
@@ -254,7 +254,7 @@
     return 28;
 }
 
-- (NSString *)Gio_chi:(NSInteger)h {
+- (NSString *)Gio_chi:(int)h {
     if (h == 23 || (h >= 0 && h <= 1))
         return @"Tí";
     else if (h > 1 && h <= 3)
@@ -282,7 +282,7 @@
     return nil;
 }
 
-- (NSArray *)Ngay_can_chi:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSArray *)Ngay_can_chi:(int)dd Month:(int)mm Year:(int)yy {
     NSArray *paramCan = [NSArray arrayWithObjects:@"Giáp", @"Ất", @"Bính", @"Đinh", @"Mậu", @"Kỷ", @"Canh", @"Tân", @"Nhâm", @"Quý", nil];
     NSArray *paramCanNgay = [NSArray arrayWithObjects:@"Dần", @"Mão", @"Thìn", @"Tỵ", @"Ngọ", @"Mùi", @"Thân", @"Dậu", @"Tuất", @"Hợi", @"Tý", @"Sửu", nil];
     
@@ -291,17 +291,17 @@
     return [NSArray arrayWithObjects:[paramCan objectAtIndex:( (t+9)%10 )], [paramCanNgay objectAtIndex:( (t + 11) % 12 )], nil];
 }
 
-- (NSArray *)Thang_can_chi:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSArray *)Thang_can_chi:(int)dd Month:(int)mm Year:(int)yy {
     NSArray *paramCan = [NSArray arrayWithObjects:@"Giáp", @"Ất", @"Bính", @"Đinh", @"Mậu", @"Kỷ", @"Canh", @"Tân", @"Nhâm", @"Quý", nil];
     NSArray *paramCanNgay = [NSArray arrayWithObjects:@"Dần", @"Mão", @"Thìn", @"Tỵ", @"Ngọ", @"Mùi", @"Thân", @"Dậu", @"Tuất", @"Hợi", @"Tý", @"Sửu", nil];
     
     //short[] t = to_am(dd, mm, yy, TZ);
     NSArray *tmpl = [self to_am:dd month:mm year:yy TimeZone:TZ];
     //return new String[] { Parameter.can[(t[2] * 12 + t[1] + 3) % 10], Parameter.can_ngay[t[1] - 1] };
-    return [NSArray arrayWithObjects:[paramCan objectAtIndex:(([[tmpl objectAtIndex:2] integerValue] * 12 + [[tmpl objectAtIndex:1] integerValue] + 3) % 10)], [paramCanNgay objectAtIndex:([[tmpl objectAtIndex:1] integerValue] - 1)], nil];
+    return [NSArray arrayWithObjects:[paramCan objectAtIndex:(([[tmpl objectAtIndex:2] intValue] * 12 + [[tmpl objectAtIndex:1] intValue] + 3) % 10)], [paramCanNgay objectAtIndex:([[tmpl objectAtIndex:1] intValue] - 1)], nil];
 }
 
-- (NSArray *)Nam_can_chi:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSArray *)Nam_can_chi:(int)dd Month:(int)mm Year:(int)yy {
     NSArray *paramCan = [NSArray arrayWithObjects:@"Giáp", @"Ất", @"Bính", @"Đinh", @"Mậu", @"Kỷ", @"Canh", @"Tân", @"Nhâm", @"Quý", nil];
     NSArray *paramChi = [NSArray arrayWithObjects:@"Tý", @"Sửu", @"Dần", @"Mão", @"Thìn", @"Tỵ", @"Ngọ", @"Mùi", @"Thân", @"Dậu", @"Tuất", @"Hợi", nil];
     
@@ -309,10 +309,10 @@
     
     //short[] t = to_am(dd, mm, yy, TZ);
     //return new String[] { Parameter.can[(t[2] + 6) % 10], Parameter.chi[(t[2] + 8) % 12] };
-    return [NSArray arrayWithObjects:[paramCan objectAtIndex:(([[tmpl objectAtIndex:2] integerValue] + 6) % 10)], [paramChi objectAtIndex:(([[tmpl objectAtIndex:2] integerValue] + 8) % 12)], nil];
+    return [NSArray arrayWithObjects:[paramCan objectAtIndex:(([[tmpl objectAtIndex:2] intValue] + 6) % 10)], [paramChi objectAtIndex:(([[tmpl objectAtIndex:2] intValue] + 8) % 12)], nil];
 }
 
-- (NSString *)HyThan:(NSInteger)dd Mounth:(NSInteger)mm Year:(NSInteger)yy {
+- (NSString *)HyThan:(int)dd Mounth:(int)mm Year:(int)yy {
     int t = ([self jdFromDate:dd month:mm year:yy] + 9) % 10;// jdFromDate(dd, mm, yy) + 9) % 10;
     switch (t) {
 		case 0:
@@ -334,7 +334,7 @@
     return nil;
 }
 
-- (NSString *)TaiThan:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSString *)TaiThan:(int)dd Month:(int)mm Year:(int)yy {
     int t = ([self jdFromDate:dd month:mm year:yy] + 9) % 10;// (jdFromDate(dd, mm, yy) + 9) % 10;
     switch (t) {
 		case 0:
@@ -358,7 +358,7 @@
     return nil;
 }
 
-- (NSInteger)indexhoangdao:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (int)indexhoangdao:(int)dd Month:(int)mm Year:(int)yy {
     int t = ([self jdFromDate:dd month:mm year:yy] + 11) % 12; //(jdFromDate(dd, mm, yy) + 11) % 12;
     switch (t) {
 		case 0:
@@ -383,7 +383,7 @@
     return -1;
 }
 
-- (BOOL)h_hoang_dao:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy index:(NSInteger)INDEX {
+- (BOOL)h_hoang_dao:(int)dd Month:(int)mm Year:(int)yy index:(int)INDEX {
     id h[6][12];
     h[0][0] = @"1"; h[0][1] = @"1"; h[0][2] = @"0"; h[0][3] = @"0"; h[0][4] = @"1"; h[0][5] = @"1"; h[0][6] = @"0"; h[0][7] = @"1"; h[0][8] = @"0"; h[0][9] = @"0"; h[0][10] = @"1"; h[0][11] = @"0";
     h[1][0] = @"1"; h[1][1] = @"0"; h[1][2] = @"1"; h[1][3] = @"1"; h[1][4] = @"0"; h[1][5] = @"0"; h[1][6] = @"1"; h[1][7] = @"1"; h[1][8] = @"0"; h[1][9] = @"1"; h[1][10] = @"0"; h[1][11] = @"0";
@@ -403,7 +403,7 @@
     };
     */
     
-    if ([h[[self indexhoangdao:dd Month:mm Year:yy]][INDEX] integerValue] == 1)
+    if ([h[[self indexhoangdao:dd Month:mm Year:yy]][INDEX] intValue] == 1)
         return true;
     else
         return false;
@@ -411,16 +411,16 @@
 
 - (BOOL)isTetAL:(NSDate *)ddate
 {
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *weekdayComponents = [gregorian components:(NSDayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit) fromDate:ddate];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *weekdayComponents = [gregorian components:(NSCalendarUnitDay | NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:ddate];
     
-    NSInteger day = [weekdayComponents day];
-    NSInteger month = [weekdayComponents month];
-    NSInteger year = [weekdayComponents year];
+    int day = (int)[weekdayComponents day];
+    int month = (int)[weekdayComponents month];
+    int year = (int)[weekdayComponents year];
     
     NSArray *ngayAL = [self to_am:day month:month year:year TimeZone:TZ];
     
-    if ([[ngayAL objectAtIndex:0] integerValue] >= 1 && [[ngayAL objectAtIndex:0] integerValue] <= 3 && [[ngayAL objectAtIndex:1] integerValue] == 1) {
+    if ([[ngayAL objectAtIndex:0] intValue] >= 1 && [[ngayAL objectAtIndex:0] intValue] <= 3 && [[ngayAL objectAtIndex:1] intValue] == 1) {
         return YES;
     }
     
@@ -429,8 +429,8 @@
 
 - (BOOL)isTetDL:(NSDate *)ddate
 {
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *weekdayComponents = [gregorian components:(NSDayCalendarUnit | NSMonthCalendarUnit) fromDate:ddate];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *weekdayComponents = [gregorian components:(NSCalendarUnitDay | NSCalendarUnitMonth) fromDate:ddate];
     
     NSInteger day = [weekdayComponents day];
     NSInteger month = [weekdayComponents month];
@@ -444,61 +444,61 @@
 
 - (BOOL)isTrungThu:(NSDate *)ddate
 {
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-    NSDateComponents *weekdayComponents = [gregorian components:(NSDayCalendarUnit | NSYearCalendarUnit | NSMonthCalendarUnit) fromDate:ddate];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *weekdayComponents = [gregorian components:(NSCalendarUnitDay | NSCalendarUnitYear | NSCalendarUnitMonth) fromDate:ddate];
     
-    NSInteger day = [weekdayComponents day];
-    NSInteger month = [weekdayComponents month];
-    NSInteger year = [weekdayComponents year];
+    int day = (int)[weekdayComponents day];
+    int month = (int)[weekdayComponents month];
+    int year = (int)[weekdayComponents year];
     
     NSArray *ngayAL = [self to_am:day month:month year:year TimeZone:TZ];
     
-    if ([[ngayAL objectAtIndex:0] integerValue] == 15 && [[ngayAL objectAtIndex:1] integerValue] == 8) {
+    if ([[ngayAL objectAtIndex:0] intValue] == 15 && [[ngayAL objectAtIndex:1] intValue] == 8) {
         return YES;
     }
     
     return NO;
 }
 
-- (NSArray *)CacNgayLe:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSArray *)CacNgayLe:(int)dd Month:(int)mm Year:(int)yy {
     NSMutableArray *arrNgayLes = [[NSMutableArray alloc] init];
     
     // am lich
     NSArray *Ngayle = [self to_am:dd month:mm year:yy TimeZone:TZ];
     
-    if ([[Ngayle objectAtIndex:0] integerValue] == 10 && [[Ngayle objectAtIndex:1] integerValue] == 3)
+    if ([[Ngayle objectAtIndex:0] intValue] == 10 && [[Ngayle objectAtIndex:1] intValue] == 3)
         [arrNgayLes addObject:kSDayGioToHungVuong]; //Parameter.NgayLeTet[17];// gio to hung vuong
-    if ([[Ngayle objectAtIndex:0] integerValue] == 15 && [[Ngayle objectAtIndex:1] integerValue] == 1) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 15 && [[Ngayle objectAtIndex:1] intValue] == 1) {
         [arrNgayLes addObject:kSDayTetNguyenTieu]; // Ram thang gieng - tet nguyen tieu
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 3 & [[Ngayle objectAtIndex:1] integerValue] == 3) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 3 & [[Ngayle objectAtIndex:1] intValue] == 3) {
         [arrNgayLes addObject:kSDayTetHanThuc]; // tet han thuc
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 14 & [[Ngayle objectAtIndex:1] integerValue] == 4) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 14 & [[Ngayle objectAtIndex:1] intValue] == 4) {
         [arrNgayLes addObject:kSDayTetKhmer]; // tet dan toc Khmer
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 15 & [[Ngayle objectAtIndex:1] integerValue] == 7) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 15 & [[Ngayle objectAtIndex:1] intValue] == 7) {
         [arrNgayLes addObject:kSDayLeVuLan]; // le Vulan - Xa toi vong nhan
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 1 & [[Ngayle objectAtIndex:1] integerValue] == 8) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 1 & [[Ngayle objectAtIndex:1] intValue] == 8) {
         [arrNgayLes addObject:kSDayLeHoiKate]; // le hoi Kate
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 9 & [[Ngayle objectAtIndex:1] integerValue] == 9) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 9 & [[Ngayle objectAtIndex:1] intValue] == 9) {
         [arrNgayLes addObject:kSDayTetTrungCuu]; // tet trung cuu
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 10 & [[Ngayle objectAtIndex:1] integerValue] == 10) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 10 & [[Ngayle objectAtIndex:1] intValue] == 10) {
         [arrNgayLes addObject:kSDayTetTrungThap]; // tet trung thap
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 9 & [[Ngayle objectAtIndex:1] integerValue] == 8) {
+    if ([[Ngayle objectAtIndex:0] intValue] == 9 & [[Ngayle objectAtIndex:1] intValue] == 8) {
         [arrNgayLes addObject:kSDayHoiChoiTrau]; // hoi Choi trau do son
     }
-    if ([[Ngayle objectAtIndex:0] integerValue] == 5 && [[Ngayle objectAtIndex:1] integerValue] == 5)
+    if ([[Ngayle objectAtIndex:0] intValue] == 5 && [[Ngayle objectAtIndex:1] intValue] == 5)
         [arrNgayLes addObject:kSDayTetDoanNgo]; //Parameter.NgayLeTet[18];// Diệt Sâu Bọ
-    if ([[Ngayle objectAtIndex:0] integerValue] == 15 && [[Ngayle objectAtIndex:1] integerValue] == 8)
+    if ([[Ngayle objectAtIndex:0] intValue] == 15 && [[Ngayle objectAtIndex:1] intValue] == 8)
         [arrNgayLes addObject:kSDayTrungThu]; //Parameter.NgayLeTet[19];// tet trung thu
-    if ([[Ngayle objectAtIndex:0] integerValue] == 23 && [[Ngayle objectAtIndex:1] integerValue] == 12)
+    if ([[Ngayle objectAtIndex:0] intValue] == 23 && [[Ngayle objectAtIndex:1] intValue] == 12)
         [arrNgayLes addObject:kSDayTaoQuanVeTroi]; //Parameter.NgayLeTet[20];// ong tao chau troi
-    if ([[Ngayle objectAtIndex:0] integerValue] >= 1 && [[Ngayle objectAtIndex:0] integerValue] <= 3 && [[Ngayle objectAtIndex:1] integerValue] == 1)
+    if ([[Ngayle objectAtIndex:0] intValue] >= 1 && [[Ngayle objectAtIndex:0] intValue] <= 3 && [[Ngayle objectAtIndex:1] intValue] == 1)
         [arrNgayLes addObject:kSDayTetNguyenDan]; //Parameter.NgayLeTet[21];// tet nguyen dan
     
     if (dd == 1 && mm == 1)
@@ -545,7 +545,7 @@
     return arrNgayLes;
 }
 
-- (NSArray *)getKiengNen:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSArray *)getKiengNen:(int)dd Month:(int)mm Year:(int)yy {
     // luu y ngay tot xau nay la suu tam tai lieu cua cac cu ngay xua
     // nen khong chiu trach nhiem ve cac thong tin dua ra.
     // de tinh ngay tot xau dua rat nhieu vao yeu to nhu:
@@ -561,9 +561,9 @@
     NSArray *NgayXau = [NSArray arrayWithObjects:@"5", @"14", @"23", @"3", @"7", @"13", @"18", @"22", @"27", nil];
     
     for (int j = 0; j < [NgayXau count]; j++)
-        if ([[toAm objectAtIndex:0] integerValue] == [[NgayXau objectAtIndex:j] integerValue]) {
+        if ([[toAm objectAtIndex:0] intValue] == [[NgayXau objectAtIndex:j] intValue]) {
             
-            switch ([[NgayXau objectAtIndex:j] integerValue]) {
+            switch ([[NgayXau objectAtIndex:j] intValue]) {
 				case 5:
 				case 14:
 				case 23:
@@ -583,42 +583,42 @@
         }
     
     int jd = ([self jdFromDate:dd month:mm year:yy] + 11) % 12;// (jdFromDate(dd, mm, yy) + 11) % 12;
-    if (([[toAm objectAtIndex:1] integerValue] == 1 && jd == 3) || ([[toAm objectAtIndex:1] integerValue] == 2 && jd == 10)
-        || ([[toAm objectAtIndex:1] integerValue] == 3 && jd == 5) || ([[toAm objectAtIndex:1] integerValue] == 4 && jd == 1)
-        || ([[toAm objectAtIndex:1] integerValue] == 5 && jd == 6) || ([[toAm objectAtIndex:1] integerValue] == 6 && jd == 8)
-        || ([[toAm objectAtIndex:1] integerValue] == 7 && jd == 9) || ([[toAm objectAtIndex:1] integerValue] == 8 && jd == 11)
-        || ([[toAm objectAtIndex:1] integerValue] == 9 && jd == 4) || ([[toAm objectAtIndex:1] integerValue] == 10 && jd == 7)
-        || ([[toAm objectAtIndex:1] integerValue] == 11 && jd == 0) || ([[toAm objectAtIndex:1] integerValue] == 12 && jd == 2))
+    if (([[toAm objectAtIndex:1] intValue] == 1 && jd == 3) || ([[toAm objectAtIndex:1] intValue] == 2 && jd == 10)
+        || ([[toAm objectAtIndex:1] intValue] == 3 && jd == 5) || ([[toAm objectAtIndex:1] intValue] == 4 && jd == 1)
+        || ([[toAm objectAtIndex:1] intValue] == 5 && jd == 6) || ([[toAm objectAtIndex:1] intValue] == 6 && jd == 8)
+        || ([[toAm objectAtIndex:1] intValue] == 7 && jd == 9) || ([[toAm objectAtIndex:1] intValue] == 8 && jd == 11)
+        || ([[toAm objectAtIndex:1] intValue] == 9 && jd == 4) || ([[toAm objectAtIndex:1] intValue] == 10 && jd == 7)
+        || ([[toAm objectAtIndex:1] intValue] == 11 && jd == 0) || ([[toAm objectAtIndex:1] intValue] == 12 && jd == 2))
         return [NSArray arrayWithObjects:@"Có sao xấu là Sát Chủ nên cẩn thận khi dùng cho các việc mang tính chất đại sự và trọng đại. Nhất là kỵ xây nhà mới và cưới gả."
                                         ,@"Dời nhà cũ qua nhà mới. Giao dịch. Mua sắm quần áo - may mặc. Mở tiệc party. Sửa sang nhà cửa. Hội họp bạn bè."
                                         , nil];
     
-    if (([[toAm objectAtIndex:1] integerValue] == 1 && jd == 8) || ([[toAm objectAtIndex:1] integerValue] == 2 && jd == 2)
-        || ([[toAm objectAtIndex:1] integerValue] == 3 && jd == 9) || ([[toAm objectAtIndex:1] integerValue] == 4 && jd == 3)
-        || ([[toAm objectAtIndex:1] integerValue] == 5 && jd == 10) || ([[toAm objectAtIndex:1] integerValue] == 6 && jd == 4)
-        || ([[toAm objectAtIndex:1] integerValue] == 7 && jd == 11) || ([[toAm objectAtIndex:1] integerValue] == 8 && jd == 5)
-        || ([[toAm objectAtIndex:1] integerValue] == 9 && jd == 0) || ([[toAm objectAtIndex:1] integerValue] == 10 && jd == 6)
-        || ([[toAm objectAtIndex:1] integerValue] == 11 && jd == 1) || ([[toAm objectAtIndex:1] integerValue] == 12 && jd == 7))
+    if (([[toAm objectAtIndex:1] intValue] == 1 && jd == 8) || ([[toAm objectAtIndex:1] intValue] == 2 && jd == 2)
+        || ([[toAm objectAtIndex:1] intValue] == 3 && jd == 9) || ([[toAm objectAtIndex:1] intValue] == 4 && jd == 3)
+        || ([[toAm objectAtIndex:1] intValue] == 5 && jd == 10) || ([[toAm objectAtIndex:1] intValue] == 6 && jd == 4)
+        || ([[toAm objectAtIndex:1] intValue] == 7 && jd == 11) || ([[toAm objectAtIndex:1] intValue] == 8 && jd == 5)
+        || ([[toAm objectAtIndex:1] intValue] == 9 && jd == 0) || ([[toAm objectAtIndex:1] intValue] == 10 && jd == 6)
+        || ([[toAm objectAtIndex:1] intValue] == 11 && jd == 1) || ([[toAm objectAtIndex:1] intValue] == 12 && jd == 7))
         return [NSArray arrayWithObjects:@"Có sao xấu là Thọ Tử nên cẩn thận khi dùng cho các việc mang tính chất đại sự và trọng đại.",
                                         @"Ta vẫn có thể thực hiện các công việc như: Cung cấp sửa chữa lắp đặt ống nước. Dời nhà cũ qua nhà mới. Đặt bàn thờ. Đem tiền gửi nhà Bank. Gieo hạt trồng cây. Làm đường sá. Phá cây lấp đất trồng trọt. Thu tiền - đòi nợ. Tiếp thị quảng cáo hàng hóa.",
                                         nil];
     
-    if (([[toAm objectAtIndex:1] integerValue] == 1 && jd == 0) || ([[toAm objectAtIndex:1] integerValue] == 2 && jd == 3)
-        || ([[toAm objectAtIndex:1] integerValue] == 3 && jd == 6) || ([[toAm objectAtIndex:1] integerValue] == 4 && jd == 9)
-        || ([[toAm objectAtIndex:1] integerValue] == 5 && jd == 1) || ([[toAm objectAtIndex:1] integerValue] == 6 && jd == 4)
-        || ([[toAm objectAtIndex:1] integerValue] == 7 && jd == 7) || ([[toAm objectAtIndex:1] integerValue] == 8 && jd == 10)
-        || ([[toAm objectAtIndex:1] integerValue] == 9 && jd == 0) || ([[toAm objectAtIndex:1] integerValue] == 10 && jd == 2)
-        || ([[toAm objectAtIndex:1] integerValue] == 11 && jd == 5) || ([[toAm objectAtIndex:1] integerValue] == 8 && jd == 11))
+    if (([[toAm objectAtIndex:1] intValue] == 1 && jd == 0) || ([[toAm objectAtIndex:1] intValue] == 2 && jd == 3)
+        || ([[toAm objectAtIndex:1] intValue] == 3 && jd == 6) || ([[toAm objectAtIndex:1] intValue] == 4 && jd == 9)
+        || ([[toAm objectAtIndex:1] intValue] == 5 && jd == 1) || ([[toAm objectAtIndex:1] intValue] == 6 && jd == 4)
+        || ([[toAm objectAtIndex:1] intValue] == 7 && jd == 7) || ([[toAm objectAtIndex:1] intValue] == 8 && jd == 10)
+        || ([[toAm objectAtIndex:1] intValue] == 9 && jd == 0) || ([[toAm objectAtIndex:1] intValue] == 10 && jd == 2)
+        || ([[toAm objectAtIndex:1] intValue] == 11 && jd == 5) || ([[toAm objectAtIndex:1] intValue] == 8 && jd == 11))
         return [NSArray arrayWithObjects:@"Có sao xấu là Vãng Vong là ngày trăm sự đều kỵ. Kỵ nhất là xuất hành.",
                                         @"Gieo hạt trồng cây. Làm đường sá. Phá cây lấp đất trồng trọt. Thu tiền - đòi nợ. Dọn dẹp nhà cửa. Gieo mạ. Hội họp bạn bè.",
                                         nil];
     
-    if (([[toAm objectAtIndex:1] integerValue] == 1 && jd == 0) || ([[toAm objectAtIndex:1] integerValue] == 2 && jd == 3)
-        || ([[toAm objectAtIndex:1] integerValue] == 3 && jd == 6) || ([[toAm objectAtIndex:1] integerValue] == 4 && jd == 9)
-        || ([[toAm objectAtIndex:1] integerValue] == 5 && jd == 1) || ([[toAm objectAtIndex:1] integerValue] == 6 && jd == 4)
-        || ([[toAm objectAtIndex:1] integerValue] == 7 && jd == 7) || ([[toAm objectAtIndex:1] integerValue] == 8 && jd == 10)
-        || ([[toAm objectAtIndex:1] integerValue] == 9 && jd == 0) || ([[toAm objectAtIndex:1] integerValue] == 10 && jd == 2)
-        || ([[toAm objectAtIndex:1] integerValue] == 11 && jd == 5) || ([[toAm objectAtIndex:1] integerValue] == 8 && jd == 11))
+    if (([[toAm objectAtIndex:1] intValue] == 1 && jd == 0) || ([[toAm objectAtIndex:1] intValue] == 2 && jd == 3)
+        || ([[toAm objectAtIndex:1] intValue] == 3 && jd == 6) || ([[toAm objectAtIndex:1] intValue] == 4 && jd == 9)
+        || ([[toAm objectAtIndex:1] intValue] == 5 && jd == 1) || ([[toAm objectAtIndex:1] intValue] == 6 && jd == 4)
+        || ([[toAm objectAtIndex:1] intValue] == 7 && jd == 7) || ([[toAm objectAtIndex:1] intValue] == 8 && jd == 10)
+        || ([[toAm objectAtIndex:1] intValue] == 9 && jd == 0) || ([[toAm objectAtIndex:1] intValue] == 10 && jd == 2)
+        || ([[toAm objectAtIndex:1] intValue] == 11 && jd == 5) || ([[toAm objectAtIndex:1] intValue] == 8 && jd == 11))
         return [NSArray arrayWithObjects:@"Có sao xấu là Vãng Vong là ngày trăm sự đều phải kỵ. Kỵ nhất là xuất hành.",
                                         @"Gieo hạt trồng cây. Làm đường sá. Phá cây lấp đất trồng trọt. Thu tiền đòi nợ. Dọn dẹp nhà cửa. Gieo mạ. Hội họp bạn bè.",
                                         nil];
@@ -626,7 +626,7 @@
     return [self NgayTruc:dd Month:mm Year:yy];//NgayTruc(dd, mm, yy);
 }
 
-- (NSArray *)NgayTruc:(NSInteger)dd Month:(NSInteger)mm Year:(NSInteger)yy {
+- (NSArray *)NgayTruc:(int)dd Month:(int)mm Year:(int)yy {
     int truckien = [self TrucKien:mm];// TrucKien(mm);
     int jd = ([self jdFromDate:dd month:mm year:yy] + 11) % 12;
     if (truckien == jd)
@@ -701,7 +701,7 @@
     return [NSArray arrayWithObjects:@"", @"", nil];
 }
 
-- (NSInteger)TrucKien:(NSInteger)mm {
+- (int)TrucKien:(int)mm {
     if (mm == 2)
         return 0;// dần
     if (mm == 3)
@@ -735,12 +735,12 @@
 //};// Các ngày trên thì không nên làm những việc quan trọng
 // tuy nhiên có thể chọn giờ tốt để thực hiện các việc khác
 
-- (double)jdAtVST:(NSInteger)d Month:(NSInteger)m Year:(NSInteger)y Hour:(NSInteger)hour Minute:(NSInteger)min {
+- (double)jdAtVST:(int)d Month:(int)m Year:(int)y Hour:(int)hour Minute:(int)min {
     int ret = [self jdFromDate:d month:m year:y];
     return (double)(ret - 0.5 + (hour - 7) / 24.0 + min / 1440.0);
 }
 
-- (NSString *)getTietKhi:(NSInteger)d Month:(NSInteger)m Year:(NSInteger)y Hour:(NSInteger)hour Minute:(NSInteger)min {
+- (NSString *)getTietKhi:(int)d Month:(int)m Year:(int)y Hour:(int)hour Minute:(int)min {
     double jd = [self jdAtVST:d Month:m Year:y Hour:hour Minute:min];
     double s1 = [self SunLongitude:jd];
     //int s2 = (int) s1;
@@ -899,7 +899,7 @@
     return nil;
 }
 
-- (NSInteger)getTietKhiInt:(NSInteger)d Month:(NSInteger)m Year:(NSInteger)y Hour:(NSInteger)hour Minute:(NSInteger)min {
+- (int)getTietKhiInt:(int)d Month:(int)m Year:(int)y Hour:(int)hour Minute:(int)min {
     double jd = [self jdAtVST:d Month:m Year:y Hour:hour Minute:min];// jdAtVST(d, m, y, hour, min);
     double s1 = [self SunLongitude:jd];// SunLongitude(jd);
     if (s1 >= 0.0 && s1 < 15.0) {
@@ -954,7 +954,7 @@
     return 1;
 }
 
--(int)getDayCountOfaMonth:(NSInteger)month Year:(NSInteger)year {
+-(int)getDayCountOfaMonth:(int)month Year:(int)year {
 	switch (month) {
 		case 1:
 		case 3:
