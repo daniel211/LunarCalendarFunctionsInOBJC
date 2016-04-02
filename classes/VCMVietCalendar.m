@@ -11,6 +11,17 @@
 
 @implementation VCMVietCalendar
 
++ (VCMVietCalendar *)share
+{
+    static dispatch_once_t once;
+    static VCMVietCalendar * share;
+    dispatch_once(&once, ^{
+        share = [self new];
+        // Configure smth
+    });
+    return share;
+}
+
 /**
  *
  * @param dd

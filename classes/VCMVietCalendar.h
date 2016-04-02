@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface VCMVietCalendar : NSObject {
-    
-}
+@interface VCMVietCalendar : NSObject
+
++ (VCMVietCalendar *)share;
 
 - (NSInteger)jdFromDate:(NSInteger)dd month:(NSInteger)mm year:(NSInteger)yy;
 - (NSArray *)jdToDate:(NSInteger)jd;
